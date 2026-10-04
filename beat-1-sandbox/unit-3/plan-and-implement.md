@@ -107,7 +107,9 @@ It reads that way because of the Phase 1 calibration. The sample rubric's diagno
 
 **Trade-offs**
 
-Making `repo-fit` preferred is the trade-off that cost me pkg-20: a plan with a good diagnosis, scope and test passes even when the comment omits the AI disclosure the repo requires. Making it required would likely flip pkg-20 to reject, but it would mean any repo policy my plan comment doesn't acknowledge holds an otherwise sound plan. I did not re-run pkg-20 or any canary with `--only` after changing it, so I don't know what else that would change; I kept the single full run (18/20) as my final run.
+`diagnosis-backed` gives up plans whose cause may be right but that I cannot verify from the package. Because the cause must explain the repro observation that isolates a variable, a plan with no isolating step in its repro grades `unclear`, and `unclear` on a required check is a hold. A correct but untested cause is rejected for that reason. It also accepts a cause that fits the isolating observation but is wrong in a way the repro never tests, since the check can only read the repro evidence in the package.
+
+How I know what it changed: wrong-cause matched 4/4 in `eval-run.txt` (pkg-01, pkg-07, pkg-11, pkg-16), and neither of my two misses came from this check. pkg-14 was rejected by `scope-matches-cause`, and pkg-20 was accepted because `repo-fit` is only preferred. I did not re-run any canary with `--only`, so I have not tested what loosening or tightening this check would change.
 
 ---
 
