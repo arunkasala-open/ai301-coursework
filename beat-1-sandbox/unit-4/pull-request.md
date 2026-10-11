@@ -15,7 +15,7 @@ label is not graded.
 
 **Pull request**
 
-PENDING: PR not opened yet; link to be added once it is.
+https://github.com/codepath/pathreview-ai301-fa26-s1/pull/131
 
 **Branch**
 
