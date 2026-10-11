@@ -15,15 +15,11 @@ label is not graded.
 
 **Pull request**
 
-[Link to the pull request you opened. It must be the pull request's own page on the Path
-Review repo, not your fork's branch page.]
+PENDING: PR not opened yet; link to be added once it is.
 
 **Branch**
 
-[The name of the branch the pull request comes from, exactly as it appears in your fork.
-The naming shape is a type prefix, then the issue number, then a short description. **The
-issue number in the branch name must be the number of the issue the pull request fixes** —
-a name carrying any other number does not satisfy this field.]
+`fix/72-verify-password-malformed-hash`
 
 ## Eval iterations
 
@@ -32,28 +28,21 @@ fields.
 
 **Run history**
 
-[The agreement score of each run you did, in order. A single run is a complete answer if
-only one run occurred. **The last score in your list must match the agreement line in the
-`eval-run.txt` you committed** — that file is the record of your final run.]
+One full run, in order: 19/20 (bar 18/20, PASS). `eval-run.txt` records: "agreement: 19/20 scored items  (bar: 18/20: PASS)". Categories: clear-accept 6/7, not-tested 4/4, silent-drift 4/4, standards-wall 2/2, unreviewable 3/3. I did not revise after it.
 
 **Package analysis**
 
-[Pick one scored package (`pkg-01` through `pkg-20` — the four `calib-` packages are never
-scored). Name it by id, say what your rubric decided and what the gold label said, and
-explain why your rubric read it that way.]
+pkg-16 (kubernetes/minikube#23471). Gold label: accept ("honestly disclosed shortfall: image-load path fails loudly with before/after transcripts; the start-path behavior deliberately deferred ... ready as scoped"). My tool rejected it, failing repo-checks-run. My rubric reads that check as: "The evidence names or shows the repo's own required checks run on the branch (and their result), or honestly states which could not be run and why. **Fail** if the repo requires checks and nothing shows them run or disclosed as skipped." pkg-16's test evidence shows `go test ./pkg/minikube/machine/... ./cmd/...` passing, and its repo facts name no required checks. The harness output only says "failed: repo-checks-run" and I did not read the per-check evidence line, so I infer the grader read the narrow `go test` run as the repo's checks not being fully shown, or read the no-stated-checks case as unclear. Either way, my rule "**Unclear** if the repo states no checks" counts as fail, so the miss comes from my rule, not from the run.
 
 **Check rationale**
 
-[Quote one check from the `rubric.md` you uploaded to `tools/pr-precheck/`, exactly as it reads now.
-Then say why it reads that way — what you revised to get there, or what you rejected in
-favour of it.]
+> | repo-checks-run | The test evidence and description, read against the repo's stated checks in the repo facts or CONTRIBUTING (test suite, linter, formatter, type check). | The evidence names or shows the repo's own required checks run on the branch (and their result), or honestly states which could not be run and why. **Fail** if the repo requires checks and nothing shows them run or disclosed as skipped. **Unclear** if the repo states no checks. | required |
+
+It reads this way because I rewrote my Unit 3 rubric for a PR without the activity worksheet, and it needed a check for the "not tested" family beyond the before/after: a PR can show a decisive repro and still never run the repo's own suite, linter or type check. I kept it required because Path Review's CONTRIBUTING.md demands all five CI jobs. I accepted the "honestly states which could not be run and why" clause rather than demanding every check run, so a disclosed skip is not failed, which is the honest-outcome rule.
 
 **Trade-offs**
 
-[Every check gives something up. Any one of these is a complete answer: a package whose
-result it changes, a canary you re-ran with `--only`, a case you accept it will miss, or a
-stated reason nothing changed elsewhere. "Nothing changed, and here is how I know" earns
-the point in full when the reason follows.]
+One case this check misses or gets wrong: pkg-16, a gold accept my tool rejects, because "Unclear if the repo states no checks" counts as fail under my verdict rule. I accept that cost: a repo with no stated checks is rare, and loosening it risks flipping not-tested packages that agree today (4/4). I did not re-run with `--only` or change anything after the full run, since 19/20 cleared the bar and every category had a match. Nothing else changed, and I know because there was only the one full run in `eval-run.txt`.
 
 ---
 
