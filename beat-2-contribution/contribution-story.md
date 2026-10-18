@@ -55,10 +55,9 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: issue-scout with my own search strategy, rubric fix, and a graded scan**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I wrote a search strategy of four `gh search issues` queries (Python and JavaScript, good first issue and help wanted, plus a tests query) with ranking filters that drop assigned, stale, heavily discussed and styling issues, then ordered the rest by fewest comments. The first scan fell short: all five graded issues passed, but three came from `unmess`, a 9-day-old solo repo that has never reviewed a PR, and fewest-comments-first favored issues posted minutes earlier. In response I tightened `maintainer-alive` so a single-author repo needs evidence of outside interaction, and I added strategy rules to drop issues under 3 days old and titles containing "UI" or "CSS". I have not re-scanned to confirm those fixes work.
 
 **Unit 6: [one line on the tool work]**
 
