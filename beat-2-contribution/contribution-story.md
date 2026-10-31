@@ -1,4 +1,4 @@
-# Contribution: [Issue Title]
+# Contribution: Refactor/rearrange tests (qim3d #193)
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -8,10 +8,9 @@ format criteria grade exactly that. Your course repo link is the whole submissio
 files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
-**Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
-**Issue:** [GitHub issue link]
+**Student:** Arun Kasala
+**GitHub Username:** arunkasala-open
+**Issue:** https://github.com/qim-center/qim3d/issues/193
 **Pull Request:** [GitHub PR link, once opened]
 
 One repository, built across units 5 to 8, telling the whole story of your real
@@ -79,24 +78,16 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
-[1-2 paragraphs in your own words: how you searched, what your scan
-surfaced, what your scout's verdict said, why this issue fits your
-profile, and what you hope to learn. If your scout's verdict on it
-was reject and you chose it anyway, say so here and say why; choosing
-against your own tool silently is what loses points. Close with an
-honest read of the tool itself: where the scout fell short on a real
-wild search and what you changed or would change, or what convinced
-you it held up. **Record the link to your claim comment in this section too.**
-Not claimed yet? Write `claim pending` and today's date where the link goes,
-and add the link the moment your claim lands.]
+My first pick was not this issue. On 2026-10-18 my scout graded three picks directly (FluentFlyout #540, jellyfin #17666, Listenarr #582) and accepted only FluentFlyout #540, so I claimed it. When I re-graded those three on 2026-10-31 after this week's scope patch, all three came back rejected on `unclaimed`. Jellyfin and Listenarr each have an open PR from someone else. FluentFlyout was rejected because of my own claim, which led me to add an exception, after which #540 passed as "moderate". Then I looked at the code and found that FluentFlyout is a Windows-only WPF app (`net10.0-windows`), and I work on a Mac, so I could not reproduce or test a fix. I posted an unclaim comment on #540 and searched again. The two Python picks from my first scan (pr-agent #4161 and #4162) had both been closed. I re-ran my four strategy queries with my ranking filters, which left 71 results. Most were tiny single-author repos my `maintainer-alive` check rejects, so I read the full threads of the two established Python projects near the top (both had zero comments) and had the scout grade them. It rejected glass #839 because it is a container for 13 sub-issues, and it accepted qim3d #193 ("Refactor/rearrange tests") with a **moderate** difficulty note: the two files the maintainer named are still undone, anything beyond them is my call to agree with him, and the test-naming rule from PR #194 is enforced by a pre-commit hook.
+
+It fits me because it is all Python and all tests, and the job is reading a test suite I have never seen and reorganising it the way the project already works. That is exactly the practice my fit profile asks for. qim3d's CI also runs on macOS, so I can build and test it on my own machine. I hope to learn how a real scientific Python project lays out its pytest suite, to work with its `uv`/`just`/`prek` tooling, and to get a PR through its two-step review. My honest read of the scout: its grading held up, but my setup has gaps. The rubric had no idea which claims were mine, and nothing in my fit profile says I need code that runs on a Mac, so the scout accepted a Windows-only app and I lost a pick because of it. The scope patch did its job (Listenarr #582 now passes the scope check and fails only on its open PR). The scout caught glass #839 as a container from its sub-issue list, but my scope check only names the issue body as evidence, so I would add sub-issues there. I would also add "runs on macOS" to my fit profile. My claim comment: https://github.com/qim-center/qim3d/issues/193#issuecomment-6548255139
 
 **Toolkit**
 
-- Tool: issue-scout (your scout: your search strategy, your rubric),
-  and how you used it
-- What it produced: [the scan and its verdict on this issue, described]
-- Difficulties: [where it fell short, or "none met" if none did]
-- What changed: [what you patched or would update, or "nothing"]
+- Tool: issue-scout, with my search strategy and my rubric. I ran it in direct-grade mode (`issue-scout: grade <URLs>`) three times on 2026-10-31: on my three old picks, on #540 again after a rubric fix, and on two new candidates I found by running my strategy queries and filters again.
+- What it produced: verdicts with check-by-check evidence. The two new candidates got: qim3d #193 accept, difficulty moderate, with the open edge named ("agree the list with the maintainer"); glass #839 reject on `scope-feasible`, a container with 13 sub-issues. All three old picks came back rejected on `unclaimed`.
+- Difficulties: the old `scope-fits` check rejected issues with any open design edge, which real issues almost always have. `unclaimed` counted my own claim on #540 as a competing one. The scout had no way to know I need code that runs on macOS, so it accepted a Windows-only app.
+- What changed: I applied the unit-6 scope patch, replacing `scope-fits` with `scope-feasible` and adding the difficulty note, so open edges are flagged instead of rejected. I added an exception to `unclaimed` so my own account's claim reads as "already yours". I would also add "runs on macOS" to my fit profile and add sub-issues to the scope check's evidence.
 
 ---
 
