@@ -58,11 +58,9 @@ one in the week it belongs to.
 
 I wrote a search strategy of four `gh search issues` queries (Python and JavaScript, good first issue and help wanted, plus a tests query) with ranking filters that drop assigned, stale, heavily discussed and styling issues, then ordered the rest by fewest comments. The first scan fell short: all five graded issues passed, but three came from `unmess`, a 9-day-old solo repo that has never reviewed a PR, and fewest-comments-first favored issues posted minutes earlier. In response I tightened `maintainer-alive` so a single-author repo needs evidence of outside interaction, and I added strategy rules to drop issues under 3 days old and titles containing "UI" or "CSS". I have not re-scanned to confirm those fixes work.
 
-**Unit 6: [one line on the tool work]**
+**Unit 6: voice guard with an Upstream section in my voice guide, and a CLAUDE.local.md for qim3d**
 
-[2-4 sentences: the voice-guard, the repo-memory file. What broke or
-fell short, and what changed because of it. "Nothing broke" counts when
-it is true - say how you know.]
+I folded my three voice-guide copies into one canonical guide, added Upstream rules for claims, questions and pings, and installed the voice guard as a Claude Code hook on every `gh` comment, issue or PR I post. It broke silently at first: `python3` on my Mac is 3.8, the checker needs 3.9, and a crashed hook doesn't block anything, so posts would have gone out unchecked until I pointed the hook at `/usr/bin/python3` and confirmed it with the wiring test. After that it did its job: it stopped my first qim3d claim draft on my own rule "I never promise a date I haven't checked against my own schedule", and I softened "open a PR within a week" to "post an update or open a PR within a week" before posting. For the repo memory, I wrote a 37-line `CLAUDE.local.md` from qim3d's CONTRIBUTING.md and one scoped orientation run over `qim3d/generate/` and its tests, kept out of my PR with `.git/info/exclude`; nothing broke there, and I know its commands work because I ran each one (baseline: 43 tests passed, lint clean).
 
 **Unit 7: [one line on the tool work]**
 
