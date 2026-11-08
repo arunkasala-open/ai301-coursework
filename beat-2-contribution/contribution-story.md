@@ -11,7 +11,7 @@ files and no evidence uploads are part of Assignment 5.
 **Student:** Arun Kasala
 **GitHub Username:** arunkasala-open
 **Issue:** https://github.com/qim-center/qim3d/issues/193
-**Pull Request:** [GitHub PR link, once opened]
+**Pull Request:** https://github.com/qim-center/qim3d/pull/298
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -62,15 +62,13 @@ I wrote a search strategy of four `gh search issues` queries (Python and JavaScr
 
 I folded my three voice-guide copies into one canonical guide, added Upstream rules for claims, questions and pings, and installed the voice guard as a Claude Code hook on every `gh` comment, issue or PR I post. It broke silently at first: `python3` on my Mac is 3.8, the checker needs 3.9, and a crashed hook doesn't block anything, so posts would have gone out unchecked until I pointed the hook at `/usr/bin/python3` and confirmed it with the wiring test. After that it did its job: it stopped my first qim3d claim draft on my own rule "I never promise a date I haven't checked against my own schedule", and I softened "open a PR within a week" to "post an update or open a PR within a week" before posting. For the repo memory, I wrote a 37-line `CLAUDE.local.md` from qim3d's CONTRIBUTING.md and one scoped orientation run over `qim3d/generate/` and its tests, kept out of my PR with `.git/info/exclude`; nothing broke there, and I know its commands work because I ran each one (baseline: 43 tests passed, lint clean).
 
-**Unit 7: [one line on the tool work]**
+**Unit 7: ship-gate with a three-check manifest for qim3d**
 
-[2-4 sentences: the ship-gate and your gate manifest. What it produced
-on your real branch, what fought you, what changed because of it.]
+I wrote a `ship-manifest.md` for qim3d with three checks taken from its justfile and CI (`just install`, `just test`, `just lint`), and excluded `just pc-all` with a dated reason, because its formatters rewrite files the PR doesn't touch. On 2026-10-31 the two hook tests blocked as expected (no `--title`/`--body-file`), and a manual run on my branch passed all three checks (318 tests) and all seven pr-precheck checks. What fell short was me, not the gate: I didn't push the branch or open the PR after that pass, and nothing in my toolkit noticed until the PR monitor said NO PR YET in Unit 8. I now treat a gate pass as the signal to open the PR the same day, while the 30-minute pass is still valid.
 
-**Unit 8: [one line on the tool work]**
+**Unit 8: PR monitor with a playbook built from qim3d's review times**
 
-[2-4 sentences: the PR-monitor and your playbook. What it read, what it
-drafted, what you did with the draft.]
+I first wrote my playbook and ran the monitor on my course-repo PR (pathreview #131), where it drafted a nudge at 27 quiet days, and I posted my own one-line version instead. Running `--state` in my qim3d clone is what showed my real contribution had no PR, so I rebased, passed the ship-gate again, opened qim3d #298, and rewrote the playbook from qim3d's own data (its five latest outside PRs got a first response within 1 to 22 hours), which moved my nudge threshold from 14 days to 7. On #298 the monitor drafted a wait note (no nudge before 2026-11-15), which I kept off the thread. Two things confused me: the monitor's "no checks reported" on a brand-new fork PR, which I still need to confirm means CI is waiting rather than missing, and my voice guard looking for `my-reply.md` in my session's folder instead of my clone, which I worked around with an absolute path.
 
 ---
 
@@ -205,9 +203,10 @@ What I'm deliberately not changing: no test body, assertion, comment or test nam
    - `just test tests/generate --collect-only -q` lists 43 tests (11 + 12 + 2 + 2 + 16 in `test_noise.py`), and their function names match the step-2 list exactly.
    - `just test tests/generate` gives 43 passed, the same as the baseline.
 8. Run the gate's checks: `just test`, `just lint` and `just pc` on the changed files, and fix anything the hooks report.
-9. Commit with a conventional message, for example `refactor(tests): split generate tests by function and move data_handling tests`.
+9. Commit in two conventional commits, one per change, so each can be reviewed on its own: `refactor(tests): split test_generate.py into test_berry.py and test_rope.py`, then `refactor(tests): move data_handling tests into tests/generate`.
 
-Deviations: none yet.
+Deviations:
+- 2026-10-31, step 9: the plan said one commit. I made two instead (the split, then the move), because they're independent changes and CONTRIBUTING asks for "few, clean commits" that each leave the codebase working. Each commit passes the pre-commit hooks. Scope, files and tests are unchanged from the plan.
 
 **Toolkit**
 
@@ -220,65 +219,91 @@ Deviations: none yet.
 
 ## Testing Strategy
 
-[What observable checks prove the fix: your reproduction steps re-run
-against the built change (before and after), and the repo's own test
-suite or checks with the outcome shown. "Tests pass" with nothing
-observable named is not a strategy.]
+This change moves tests and doesn't fix behavior, so "the fix works" means two things I can observe: the layout the issue complains about is gone, and no test was lost, renamed or broken on the way. I checked both with four checks, ran each one once on macOS 26.7.1 with Python 3.13.1 on 2026-10-31, and kept the full output in `test_evidence.md` in my clone.
+
+1. **The repro steps, before and after.** I ran my Unit 6 repro steps on `main` (`b14de9f`) and again on the branch (`b07b927`).
+
+   | Repro step | Before (`main`) | After (branch) |
+   |---|---|---|
+   | `ls tests/data_handling` | `test_generate_data_handling.py` | No such file or directory |
+   | `ls tests/generate` | `test_generate.py`, `test_noise.py` | `test_background.py`, `test_berry.py`, `test_noise.py`, `test_rope.py`, `test_volume_collection.py` |
+   | `wc -l tests/generate/test_generate.py` | 379 lines, 5 `# Tests for` banners | No such file or directory |
+   | `just test tests/generate` (plus `tests/data_handling` on `main`) | 43 passed | 43 passed |
+
+   `import qim3d.data_handling` still fails on both, which is expected: the fix moves the tests to where the code is, and doesn't add a module.
+
+2. **No test lost or renamed.** Before moving anything, I saved the collected test list on `main` (43 tests). On the branch I collected again (43: 11 berry, 12 rope, 2 background, 2 volume_collection, 16 noise) and diffed the sorted test function names. There were no differences. File paths change with the move, so I compared the names after `::`. This is the check that would catch a test dropped while cutting the file by line range.
+
+3. **The ship manifest's checks, on the branch.** `just install` exit 0. `just test` (the full suite, the command CI runs) gave **318 passed**, and `just lint` gave "All checks passed!". For comparison, the full suite on `main` is also 318 passed, so the total didn't change anywhere in the suite.
+
+4. **Pre-commit hooks on each commit.** The repo's hooks ran on both commits and all passed, including `name-tests-test` (the `test_*.py` naming rule from #194), ruff check and ruff format. The excluded `just pc-all` wasn't run, because it rewrites files the PR doesn't touch.
+
+What this doesn't cover: I ran everything once and only on macOS. CI also runs Ubuntu with Python 3.12 and Windows with Python 3.13, and the PR's CI run will be the first test on those. Timing isn't part of the evidence either. The generate tests took about 4.5s on both `main` and the branch, and the 89s in my Unit 6 baseline was the first run after `uv sync`.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code in VS Code, running my repro steps from one script on `main` and then on the branch, plus the three checks from my ship manifest (`just install`, `just test`, `just lint`) in the order the ship-gate runs them, with the output written into `test_evidence.md`.
+- What it produced: a 168-line `test_evidence.md` with the before and after repro output, the before and after test lists with an empty name diff, the manifest checks (all exit 0, 318 passed), and the full suite on `main` for comparison (318 passed).
+- Difficulties: three things gave false readings on the way, and each would have gone into the evidence if I hadn't read the output. Switching back from `main` left an ignored `tests/data_handling/__pycache__` on disk, so the "folder is gone" check would have said the folder still existed. My first after-run reported "no tests ran" because my script edit changed only the echoed command and still passed the deleted `tests/data_handling` path to pytest. My first manifest loop gave "command not found" for all three checks, because zsh doesn't split `$c` into words. The timing also misled me at first: I'd taken 89s vs 4.4s as a change until I timed `main` again.
+- What changed: I removed the stale folder before the after-run and re-ran the repro and the checks with fixed commands. Only the clean runs are in `test_evidence.md`. I added the full suite on `main` so "318 passed" has something to compare with, and I dropped timing from the evidence. Next time I'd run the repro steps through `git worktree` instead of switching branches, so ignored files from one branch can't show up in the other.
 
 ---
 
 ## Implementation Notes
 
-[A running log, added to as you work. Date each entry. What you
-built, decisions you made when you made them, wrong turns included.]
+**2026-10-31: branch and baseline**
 
-**[Date]**
+The thread still had only my claim, with no maintainer answer on scope, so I kept to the two named files. CONTRIBUTING has no branch-naming rule, so I used the plan's name, `refactor/split-generate-tests`, branched from `main` at upstream `b14de9f` (0 ahead, 0 behind after `git fetch upstream`). Before touching anything I saved the collected test list (`just test tests/generate tests/data_handling --collect-only -q`: 43 tests) to `test_evidence.md`, which is kept out of commits. I also checked the section boundaries in `test_generate.py` against the plan: twisted thread 13-79, berry 82-258, rope 261-379, all as planned.
 
-[Entry]
+**2026-10-31: split `test_generate.py` (commit `1141caf`)**
 
-**[Date]**
+I built `test_berry.py` and `test_rope.py` by copying those exact line ranges, so the test bodies are byte-for-byte the same, and gave each its own import block (`numpy`, `pytest` and only its own `_shapes` names). Then `git rm` on the old file. `--collect-only` on `tests/generate` gave 39 (11 + 12 + 16), as expected at that point. Git records `test_berry.py` as a rename of `test_generate.py`, so its history follows.
 
-[Entry]
+Wrong turn: the first `git commit` was blocked by the repo's pre-commit hook (prek), not by my code. prek had built its hook environment with the first `python3` on my `PATH`, which is Python 3.8.10, and `pre-commit-hooks` 6.0.0 needs 3.9 or newer. It's the same 3.8 problem my voice guard hit in Unit 6. I cleared prek's cache (`uv run --group misc prek clean`) and committed with Python 3.13 first on `PATH`. Every hook passed, including ruff check, ruff format and the `name-tests-test` naming check. Nothing about the project needed changing. The fix belongs on my machine, and I'll put 3.13 ahead of 3.8 in my shell profile.
+
+**2026-10-31: move the data handling tests (commit `b07b927`)**
+
+`git mv tests/data_handling/test_generate_data_handling.py tests/generate/test_background.py`, then I moved its last two tests (lines 37-65, the `volume_collection` ones) into `tests/generate/test_volume_collection.py` with the same import block. Both halves use `np`, `pytest` and `qim3d`, so neither file's imports needed trimming. The folder was left with only a `__pycache__`, which I removed along with the folder. Git ended up pairing the old file with `test_volume_collection.py` as the rename (the longer half) instead of `test_background.py`. That's harmless, since `git log --follow` works either way. Pre-commit hooks passed.
+
+**2026-10-31: checks (plan steps 7-8)**
+
+Re-ran the repro steps. `ls tests/data_handling` gives "No such file or directory", `tests/generate` has exactly `test_background.py`, `test_berry.py`, `test_noise.py`, `test_rope.py` and `test_volume_collection.py`, and `test_generate.py` is gone. That differs from the repro's Actual, as planned. The collected test function names, sorted and diffed against the saved list, are identical (43 and 43). `just test tests/generate`: 43 passed. `just lint`: all checks passed. Full suite `just test`: 318 passed. Each was run once, on macOS only. The generate tests took 4.4s here against 89s at the baseline. The tests didn't change, so I put that down to the baseline being the first run after `uv sync`, not to this refactor (confirmed in the next entry: `main` also runs in 4.5s now). No new test: this change moves tests rather than fixing behavior, so the check that would fail without it is the repro re-run above (the folder and the old file are still there on `main`), plus the name diff showing nothing was lost.
+
+**2026-10-31: test evidence (step 8)**
+
+I rebuilt `test_evidence.md` from scratch instead of keeping my step-7 notes. I ran the repro steps on `main` for real "before" output instead of copying it from Unit 6, then ran them on the branch, then ran the manifest's three checks and the full suite on `main` for comparison. The full suite has 318 tests on both `main` and the branch. Running `main` again also settled the timing question: it took 4.5s, the same as the branch. A stale ignored `__pycache__` folder and two slips in my own script gave false readings along the way, and I re-ran after fixing each (see the Testing Strategy Toolkit). No code changed in this step.
+
+**2026-11-08: rebase and open the PR**
+
+My branch was one commit behind upstream (`00f02fe`, #294, docs and CLI only, no test files), so I rebased onto it. The commits are now `9a50298` (split) and `a090c9e` (move). I re-ran the manifest checks after the rebase: `just install` ok, `just test` 318 passed, `just lint` all checks passed, and `just test tests/generate` 43 passed. I added one line to `pr_draft.md` saying I re-ran the checks after the rebase, pushed the branch to my fork, and opened qim3d #298 once the ship-gate passed. The PR body is `pr_draft.md`.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code in VS Code, working in my qim3d clone from `plan.md`, plus the repo's own tooling (`just`, `uv`, and the prek pre-commit hook on every commit).
+- What it produced: two commits on `refactor/split-generate-tests`. `1141caf` splits `test_generate.py` into `test_berry.py` and `test_rope.py`, and `b07b927` moves the data handling tests into `test_background.py` and `test_volume_collection.py`. Each passed all pre-commit hooks, and each commit message says what that commit does and refers to #193. Along the way it kept a running check of the test count (43 → 39 after the split → 43 after the move).
+- Difficulties: the prek hook blocked the first commit because it built its environment with Python 3.8, the first `python3` on my `PATH`. Cutting the new files by line range was only safe because the plan recorded the exact section boundaries, and I checked them again before cutting. Git paired the old data handling file with the wrong new file as the rename. Branch switching left ignored files behind, which can fool a "this folder is gone" check.
+- What changed: I cleared prek's cache and committed with Python 3.13 first on `PATH`, and I'll put 3.13 ahead of 3.8 in my shell profile so the hook works in a normal terminal. I split the planned single commit into two and recorded that as a dated deviation in the plan and `plan.md`. I accepted git's rename pairing because history follows either way. Next time I'd check out `main` in a separate `git worktree` for before/after runs instead of switching branches.
 
 ---
 
 ## Pull Request
 
-**PR Link:** [GitHub PR URL when opened]
+**PR Link:** https://github.com/qim-center/qim3d/pull/298
 
-**PR Description:** [what the PR says; much of the content above
-adapts into it]
+**PR Description:** The title is "refactor(tests): split test_generate.py and move data_handling tests into tests/generate". The description says the PR does the two items #193 lists and only moves tests: no test bodies, test names or `qim3d/` code change, only imports. It explains the split by public function (`test_berry.py` 11 tests, `test_rope.py` 12) and the move into `test_background.py` and `test_volume_collection.py` (2 each). It says this differs from the per-header split my claim described, and asks whether the maintainer would rather have one file per header or a single `test_shapes.py`. It offers to change `Fixes #193` to `Refs` so the issue's other clean-up can stay open. It pastes the before and after repro output, the test-name diff (identical, 43 and 43), and the checks (318 passed, lint clean, also re-run after the rebase onto `00f02fe`). It says I only tested on macOS, and it has an AI-use section saying what Claude Code did and what I decided.
 
 **Maintainer Feedback:**
 
-- [Date]: [feedback received, or "none yet"; silence is a normal
-  state and costs you nothing]
-- [Date]: [how you addressed it]
+- 2026-11-08: none yet
 
-**Status:** [Awaiting review / Iterating / Merged / Closed. The
-status is a fact you record, never a grade: the PR is graded as
-opened.]
+**Status:** Awaiting review
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: the ship-gate, with my `ship-manifest.md` (`just install`, `just test`, `just lint`) and my pr-precheck. I ran it by hand from my qim3d clone with `check_gate.py --branch --title ... --body-file pr_draft.md`, then opened the PR through a Claude Code session started inside the clone so the hook would honor the pass.
+- What it produced: on 2026-10-31, a PASS on all three checks and all seven pr-precheck checks. On 2026-11-08, after my rebase, a reject first, then two PASSes, and the hook let `gh pr create` through on the last one ("honored the manual pass"), which opened #298.
+- Difficulties: the 2026-11-08 reject was my setup, not my branch. My local `main` was still at `b14de9f`, so the diff against it included #294's docs changes, and pr-precheck failed `diff-matches-plan`, `description-matches-diff` and `diff-is-reviewable`. The hook also checks the folder my Claude Code session started in, so my first `gh pr create`, from a session started in the Unit 8 folder, stopped with "branch not found". The voice-guide notes on the pass caught two loose phrases in my description: "I ran everything once" next to a re-run, and "No test code changes" when the imports did change.
+- What changed: I fast-forwarded local `main` to `upstream/main`, and the next run passed. I reworded both phrases and ran the gate again before opening the PR. I opened the PR from a session started inside the clone. Next time I'll update `main` before every gate run and open the PR right after the pass.
 
 ---
 
@@ -286,25 +311,27 @@ opened.]
 
 **Technical Skills Gained**
 
-[What you learned technically, named concretely.]
+- How pytest finds tests in a suite with no `__init__.py` files: basenames must be unique across `tests/`. I also learned to prove a refactor lost nothing by diffing the sorted test names from `--collect-only -q` before and after.
+- A real project's tooling: `uv sync` for the environment, `just` recipes for install, test and lint, and a prek pre-commit hook that enforces naming (`name-tests-test`) and ruff on every commit.
+- Git beyond add and commit: `git mv` and how git pairs renames, `git rebase upstream/main`, `.git/info/exclude` for files that must never be committed, and why a stale local `main` makes a diff lie.
+- Wiring tools into Claude Code: hooks that stop `gh` commands (voice guard, ship-gate), and why a hook that crashes or looks in the wrong folder gives a false result.
 
 **Challenges Overcome**
 
-[What was hard and how you solved it; point at the real events, the
-Toolkit blocks above are full of them.]
+- My first issue (FluentFlyout #540) was a Windows-only app I couldn't build on my Mac. I unclaimed it in the thread and re-ran my scout to find qim3d #193.
+- Python 3.8 being first on my `PATH` broke two things weeks apart: my voice guard hook in Unit 6 and qim3d's prek hook in Unit 7. Both times I fixed it by pointing the tool at Python 3.9 or newer.
+- My test evidence nearly included false readings: a stale `__pycache__` folder, a script that still passed a deleted path, and a zsh loop that didn't split commands. I caught each one by reading the output instead of trusting the exit code (Testing Strategy Toolkit).
+- My PR sat unopened for a week after the ship-gate passed. The PR monitor's NO PR YET is what surfaced it, and I rebased, re-gated and opened #298.
 
 **What I'd Do Differently Next Time**
 
-[Reflection on your process.]
+I'd open the PR the same day the gate passes, and keep a single checklist of "posted / pushed / opened" next to my claim's promised date. Missing my own "within a week" by a day is what I most want to avoid. I'd check the platform a project builds on before claiming, and add "runs on macOS" to my fit profile. I'd use `git worktree` for before and after runs instead of switching branches. And I'd keep my practice repo (pathreview) and my real contribution (qim3d) clearly apart, because I wrote my first playbook for the wrong one.
 
 ---
 
 ## Resources Used
 
-[What actually helped, not a reading list. List things this story
-already shows you using: the doc you followed to set the environment
-up, the thread that explained the bug, the person who answered you.
-One real entry beats ten plausible ones.]
-
-- [Link to documentation that helped]
-- [Discussion, issue, or post that helped]
+- [qim3d CONTRIBUTING.md](https://github.com/qim-center/qim3d/blob/main/CONTRIBUTING.md): the `uv`/`just` setup I followed, the "few, clean commits" and rebase rules behind my two-commit split and rebase, and the Review Policy my playbook's nudge rules come from.
+- [qim3d #193](https://github.com/qim-center/qim3d/issues/193): the maintainer's list of the two files to fix, which set my scope.
+- [qim3d #194](https://github.com/qim-center/qim3d/pull/194): the `test_*.py` naming rule and its pre-commit hook, and the "see #193" note that confirmed the `data_handling` folder was left for this issue.
+- The INSTALL.md guides for the ship-gate and the PR monitor in my Unit 7 and Unit 8 materials, especially the troubleshooting sections that explained the "branch not found" stop and the manual run.
