@@ -72,6 +72,8 @@ Here is part of plan-check's output from that run (2026-10-31):
 
 After looking at the feedback, I understood that I needed a better way to verify the actual changes. A good test for a refactoring task should be able to identify a problem if the intended changes are not made. Otherwise, it does not provide enough confidence that the work is correct.
 
+After plan-check rejected my first plan, I added a step to save the test names before making any changes, and I updated the test so it repeats the reproduction steps and checks that the old folder is gone and all five expected files exist. This means the test would fail on the original code if the problem had not been fixed.
+
 The test step in my plan, after the change:
 
 ```text
@@ -154,6 +156,16 @@ From my voice guard's log:
 2026-10-31 16:36 [manual] stop: rule broken: "I never let a confident-sounding paragraph substitute for pasting the real output." | target: pr_draft.md
 2026-10-31 16:37 [manual] pass | target: pr_draft.md
 ```
+
+### After I submitted
+
+After I posted my work, maintainer JeppeKlitgaard thanked me on issue #193 on November 9, 2026, and said that @delestro or another team member would review it. I followed up with @delestro on November 12 to ask for a review.
+
+> Hi @arunkasala-open,
+>
+> Thank you for working on this contribution! I am working a bit less on `qim3d` at the moment due to being allocated to another project, I am sure @delestro or another team member will be happy to review your contribution.
+>
+> (JeppeKlitgaard on qim3d issue #193, 2026-11-09)
 
 ## Limitations and what's next
 
