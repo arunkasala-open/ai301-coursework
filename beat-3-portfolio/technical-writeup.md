@@ -59,7 +59,32 @@ One thing I learned during this process was that not every test is useful for pr
 
 During my first attempt, the plan-check tool rejected my approach in its second run. The problem was that I was using a test that only counted the collected tests. This check could still pass even before making any changes, so it was not really proving that my reorganization was correct.
 
+Here is part of plan-check's output from that run (2026-10-31):
+
+```text
+**Verdict: reject (hold).**
+...
+- **test-reproduces-bug: unclear.** The test is the collect-only check (same 43 names)
+  plus `just test`, `just lint` and `just pc`. That's the right check for a refactor.
+  But there are no repro steps or Actual to compare it with, and it passes before the
+  change too, so the rubric can't score it as a pass.
+```
+
 After looking at the feedback, I understood that I needed a better way to verify the actual changes. A good test for a refactoring task should be able to identify a problem if the intended changes are not made. Otherwise, it does not provide enough confidence that the work is correct.
+
+The test step in my plan, after the change:
+
+```text
+2. Before moving anything, save the "before" test list:
+   `just test tests/generate tests/data_handling --collect-only -q`
+7. Test: re-run the repro steps against the change. Expected after the change,
+   which would fail on today's `main`:
+   - `ls tests/data_handling` gives "No such file or directory".
+   - `ls tests/generate` lists exactly `test_background.py`, `test_berry.py`,
+     `test_noise.py`, `test_rope.py` and `test_volume_collection.py`.
+   - `just test tests/generate --collect-only -q` lists 43 tests, and their
+     function names match the step-2 list exactly.
+```
 
 This helped me understand why verification is especially important when reorganizing existing code.
 
@@ -121,6 +146,14 @@ These situations taught me that command output does not always mean what I initi
 During this work, I also used Claude Code tools to help review the changes and check whether the work followed the original plan.
 
 One of the checks stopped my draft because it identified a rule that I had not followed: I should only make claims that are supported by the actual code changes and command output. After reviewing the draft, I made corrections and ran the check again.
+
+From my voice guard's log:
+
+```text
+2026-10-31 16:36 [manual] stop: rule broken: "Claim only what the diff and pasted output show" | target: pr_draft.md
+2026-10-31 16:36 [manual] stop: rule broken: "I never let a confident-sounding paragraph substitute for pasting the real output." | target: pr_draft.md
+2026-10-31 16:37 [manual] pass | target: pr_draft.md
+```
 
 ## Limitations and what's next
 
