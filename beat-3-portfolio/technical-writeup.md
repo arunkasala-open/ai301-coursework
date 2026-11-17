@@ -2,7 +2,7 @@
 
 ## Overview
 
-During this fall, I worked on my first open-source contribution to a project called qim3d. The project is used by scientists to work with and analyze 3D images. My contribution focused on improving the organization of some existing test files. I noticed that one test file containing four tests was placed in an incorrect folder, and another large test file contained tests for two different features. I worked on moving the four tests into two new files and splitting the larger file into two separate files based on their features. My main goal was to make the project easier to understand and help other developers find the tests more easily.
+This fall, I made my first contribution to an open-source project called **qim3d**, a free tool that scientists use to analyze 3D images, such as material scans. I noticed that some of the project's test files were not organized properly: one file containing four tests was in a folder that was no longer needed, and another large file mixed tests for different features. I reorganized the tests by splitting the large file into two smaller files, moving the four tests into two new files beside the related code, and removing the empty folder. After making these changes, I checked that the same 43 tests were still collected and passed, the full test suite had 318 passing tests, and all lint checks passed. I then submitted my changes in [pull request #298](https://github.com/qim-center/qim3d/pull/298), which is now waiting for maintainer review.
 
 ## What happened
 
